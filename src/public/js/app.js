@@ -3,16 +3,13 @@
 
 //io() : 백엔드 socket.io와 연결해주는 func
 const socket = io();
-/* Room */
+
+/* Create & Join Room */
 const welcome = document.querySelector("#welcome");
 const roomForm = document.querySelector(".create-room-form");
 const roomInput = document.querySelector(".create-room-input");
-
-/* Chat */
 const room = document.querySelector("#room");
 room.hidden = true;
-
-//let roomName;
 
 const roomToggle = (roomTitleValue) => {
     room.hidden = false;
@@ -26,8 +23,47 @@ const submitEnterHandler = (e) => {
     const inputValue = roomInput.value;
     //socket.emit("만들 이벤트 이름", {보낼 argument}, callbackFunc)
     socket.emit("enter_room", { payload: inputValue }, roomToggle);
-    //roomName = inputValue;
     return (roomInput.value = "");
 };
 
 roomForm.addEventListener("submit", submitEnterHandler);
+
+/* Enter & Disconnect Message */
+const addMessage = (text) => {
+    const roomChatUl = document.querySelector(".room-chat-ul");
+    const li = document.createElement("li");
+    li.innerHTML = text;
+    roomChatUl.appendChild(li);
+};
+
+socket.on("Welcome", () => {
+    addMessage("Someone Joined!");
+});
+
+socket.on("bye", () => {
+    addMessage("Someone Left the Room!");
+});
+
+socket.on("text_send", (text) => {
+    addMessage(`Stranger : ${text}`);
+});
+
+/* Message */
+const roomChatForm = document.querySelector(".room-chat-form");
+const roomChatInput = document.querySelector(".room-chat-input");
+
+const messageSubmitHandler = (e) => {
+    e.preventDefault();
+    const roomTitle = document.querySelector(".room-title");
+    const inputValue = roomChatInput.value;
+    const currentRoom = roomTitle.innerHTML;
+    socket.emit(
+        "send_message",
+        { payload: inputValue, targetRoom: currentRoom },
+        addMessage
+    );
+    roomChatInput.value = "";
+    return;
+};
+
+roomChatForm.addEventListener("submit", messageSubmitHandler);

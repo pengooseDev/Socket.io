@@ -15,9 +15,9 @@ html(lang="en")
                     button Enter Room 
             div#room
                 h3(class="room-title")
-                ul 
-                form
-                    input(placeholder="message", required, type="text")
+                ul(class="room-chat-ul")
+                form(class="room-chat-form")
+                    input(class="room-chat-input" placeholder="message", required, type="text")
                     button Send
         script(src="/socket.io/socket.io.js") 
         script(src="/public/js/app.js")
