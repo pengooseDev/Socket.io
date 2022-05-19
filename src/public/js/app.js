@@ -36,16 +36,25 @@ const addMessage = (text) => {
     roomChatUl.appendChild(li);
 };
 
-socket.on("Welcome", () => {
-    addMessage("Someone Joined!");
+socket.on("Welcome", (data) => {
+    if (!data) {
+        return addMessage(`Someone Joined!`);
+    }
+    return addMessage(`${data} Joined!`);
 });
 
-socket.on("bye", () => {
-    addMessage("Someone Left the Room!");
+socket.on("bye", (data) => {
+    if (!data) {
+        return addMessage(`Somone Left the Room!`);
+    }
+    return addMessage(`${data} Left the Room!`);
 });
 
-socket.on("text_send", (text) => {
-    addMessage(`Stranger : ${text}`);
+socket.on("text_send", (data) => {
+    if (!data.nickNameData) {
+        return addMessage(`Stranger : ${data.textData}`);
+    }
+    return addMessage(`${data.nickNameData} : ${data.textData}`);
 });
 
 /* Message */
@@ -67,3 +76,38 @@ const messageSubmitHandler = (e) => {
 };
 
 roomChatForm.addEventListener("submit", messageSubmitHandler);
+
+/* NickName */
+const nickNameForm = document.querySelector(".nickname-form");
+const nickNameSubmitHandler = (e) => {
+    e.preventDefault();
+    const nickNameInput = document.querySelector(".nickname-input");
+    const inputValue = nickNameInput.value;
+    socket.emit("save_nickname", { payload: inputValue });
+    return;
+};
+nickNameForm.addEventListener("submit", nickNameSubmitHandler);
+
+/* Room */
+
+socket.on("room_re_rendering", (data) => {
+    const roomUl = document.querySelector(".room-ul");
+    const roomData = data.payload;
+    //roomaData[0] : name / [1] : size
+
+    console.log("!!!", roomData);
+
+    while (roomUl.hasChildNodes()) {
+        roomUl.removeChild(roomUl.firstChild);
+    }
+
+    roomData[0].forEach((v, i) => {
+        const li = document.createElement("li");
+        li.innerHTML = `${v} (${
+            roomData[1][i] > 1
+                ? `${roomData[1][i]} Penguins`
+                : `${roomData[1][i]} Penguin`
+        } Here)`;
+        roomUl.appendChild(li);
+    });
+});
