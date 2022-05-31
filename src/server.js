@@ -1,4 +1,3 @@
-import { count } from "console";
 import express from "express";
 import http from "http";
 import path from "path";
@@ -108,8 +107,6 @@ const connectionHandler = (socket) => {
         return;
     });
 };
-
-wsServer.on("connection", connectionHandler);
 
 // app을 listen하는게 아닌 httpServer를 listen해야함.
 httpServer.listen(PORT, listenHandler);
