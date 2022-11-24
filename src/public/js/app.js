@@ -1,7 +1,3 @@
-//이거 바닐라js파일임. import 불가..
-//import { submitEnterHandler } from "./controller";
-
-//io() : 백엔드 socket.io와 연결해주는 func
 const socket = io();
 
 /* Create & Join Room */
